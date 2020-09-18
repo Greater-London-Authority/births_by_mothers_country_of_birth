@@ -1,0 +1,12 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+
+births_by_mothers_country_of_birth_markdown.md
+
+data/*
+figures/*
+
+*.jpeg
+

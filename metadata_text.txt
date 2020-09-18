@@ -1,0 +1,5 @@
+The Office for National Statistics (ONS) publishes data on the number of live births by the parents' country of birth in England and Wales each year. Every time a birth is registered in England and Wales both parents are required to state their places of birth on their child's birth certificate, and this information is then collated to produce these statistics. 
+
+In order to make it easier to look at what these data tell us about births in London, and how these have been changing over time, the GLA Demography team has extracted the data which relate to London from the main ONS dataset since 2001 and presented it here in an easily accessible format.  
+
+For more information about how the ONS produces these statistics, please visit their website: https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths
