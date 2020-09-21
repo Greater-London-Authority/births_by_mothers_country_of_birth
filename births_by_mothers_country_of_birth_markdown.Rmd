@@ -63,7 +63,7 @@ In order to make it easier to look at what these data tell us about births in Lo
 For more information about how the ONS produces these statistics, please visit their website: https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths
 
 For more information about how we extracted these data and created this report, please this project's Github repository:
-https://github.com/Greater-London-Authority/births_by_parents_country_of_birth
+https://github.com/Greater-London-Authority/births_by_mothers_country_of_birth
 
 $~$
 
