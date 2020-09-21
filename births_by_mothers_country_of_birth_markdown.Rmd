@@ -12,8 +12,6 @@ always_allow_html: yes
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
-# TODO change datastore page address to be births by mother's country of birth?
-
 # Load required packages (Work out what to do about package dependencies)
 # install.packages(c("magick", "sf", "sp"))
 library(tidyverse)
@@ -58,14 +56,14 @@ mothers_cob_data<-
 latest_year<-max(distinct(select(mothers_cob_data, year)))
 ```
 
-The Office for National Statistics (ONS) publishes data on the number of live births by the parents' country of birth in England and Wales each year. Every time a birth is registered in England and Wales both parents are required to state their places of birth on their child's birth certificate, and this information is then collated to produce these statistics. 
+The Office for National Statistics (ONS) publishes data on the number of live births by the mother's country of birth in England and Wales each year. Every time a birth is registered in England and Wales both parents are required to state their places of birth on their child's birth certificate, and this information is then collated to produce these statistics. 
 
 In order to make it easier to look at what these data tell us about births in London, and how these have been changing over time, the GLA Demography team has extracted the data which relate to London from the main ONS dataset since 2001 and presented it here in an easily accessible format.  
 
 For more information about how the ONS produces these statistics, please visit their website: https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths
 
 For more information about how we extracted these data and created this report, please this project's Github repository:
-https://github.com/David-Kingman/births_by_parents_country_of_birth
+https://github.com/Greater-London-Authority/births_by_parents_country_of_birth
 
 $~$
 
@@ -213,14 +211,16 @@ least_foreign_born_region_number<-
 most_foreign_born_region_perc<-
   arrange(regions_births_data_latest_year, -total_births_overseas_mothers) %>% 
   select(overseas_perc) %>% 
-  mutate(overseas_perc=percent(overseas_perc)) %>% 
-  slice_head()
+  mutate(overseas_perc=percent(round(overseas_perc, 2))) %>% 
+  slice_head() %>% 
+  mutate(oversea_perc=str_remove(overseas_perc, ".0"))
 
 least_foreign_born_region_perc<-
   arrange(regions_births_data_latest_year, -total_births_overseas_mothers) %>% 
   select(overseas_perc) %>% 
-  mutate(overseas_perc=percent(overseas_perc)) %>% 
-  slice_tail()
+  mutate(overseas_perc=percent(round(overseas_perc, 2))) %>% 
+  slice_tail() %>% 
+  mutate(oversea_perc=str_remove(overseas_perc, ".0"))
 
 ew_total_births_overseas_mothers<-
   summarise(regions_births_data_latest_year, ew_total_births_overseas_mothers=sum(total_births_overseas_mothers))
@@ -259,7 +259,7 @@ london_total_table<-
          `Total Births - UK Mothers`=UK,
          `Total Births - Overseas Mothers`=total_births_overseas_mothers,
          `Pre-2004 EU countries`:`Rest of the world`) %>% 
-  mutate_if(is.numeric, funs(perc=./`Total Births`)) %>% 
+  mutate_if(is.numeric, funs(perc=round(./`Total Births`, 2))) %>% 
   mutate_at(vars(contains("perc")), ~percent(.)) %>% 
   mutate_at(vars(3:11), ~comma(.)) %>% 
   select(Year,
@@ -325,10 +325,12 @@ iwalk(borough_births_data_latest_year[5:13],
       ggplot(aes(geometry=geometry, fill=.x))+
       ggla_sf()+
       theme_gla()+
-      scale_fill_gradient(labels=percent_format())+
+      scale_fill_gradient(labels=percent_format(),
+                          low="slategray1",
+                          high="royalblue4")+
       theme(legend.position="right")+
       labs(title=paste0("Proportion of all live births that were to mothers born in\n", .y, ", ", latest_year),
-           caption = "\nChart: GLA City Intelligence\nSource: ONS Births by parents' country of births statistics\nN.B. Data for City of London has been combined with Hackney")+
+           caption = "\nChart: GLA City Intelligence\nSource: ONS Births by parents' country of births statistics\nN.B. Data for City of London are included with Hackney")+
       ggsave(paste0("figures/maps/", .y, "_", latest_year, ".jpeg"), width=8, height=8, units="in"))
       # ggsave(paste0("figures/maps/", .y, "_", latest_year, ".jpeg"), type="cairo"))
 
@@ -338,6 +340,10 @@ image_write(image_append(c(maps_list[[9]], maps_list[[4]])), "map_slot_1.jpeg")
 image_write(image_append(c(maps_list[[6]], maps_list[[5]])), "map_slot_2.jpeg")
 image_write(image_append(c(maps_list[[7]], maps_list[[3]])), "map_slot_3.jpeg")
 image_write(image_append(c(maps_list[[1]], maps_list[[8]])), "map_slot_4.jpeg")
+
+# borough_births_data_latest_year %>% 
+#   select(year:`Rest of the world`) %>% 
+#   write_csv(paste0("data/births_by_mothers_country_of_birth_", latest_year, "LA_maps_data.csv"))
 ```
 
 ## Births by Mother's Country of Birth by London Borough

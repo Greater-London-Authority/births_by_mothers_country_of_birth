@@ -30,7 +30,8 @@ if (!dir.exists("figures")) {dir.create("figures")}
 years<-
   read_html("https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths/datasets/parentscountryofbirth") %>% 
   html_nodes(".margin-bottom--0") %>% 
-  html_text()
+  html_text() %>%
+  str_extract("\\d{4}")
 
 # 2.2 Get ONS workbook URLs
 workbook_urls<-

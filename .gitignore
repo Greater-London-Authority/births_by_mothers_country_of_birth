@@ -1,12 +1,64 @@
+# Adapted from
+#	https://github.com/github/gitignore/blob/master/R.gitignore
+#	https://github.com/elsewhencode/project-guidelines/blob/master/.gitignore
+
 .Rproj.user
 .Rhistory
 .RData
 .Ruserdata
+.Rprofile
+.Renviron
 
+births_by_mothers_country_of_birth_markdown.html
 births_by_mothers_country_of_birth_markdown.md
-
+births_by_mothers_country_of_birth_markdown_files/*
 data/*
 figures/*
-
 *.jpeg
+
+# Produced documentation (saved for later in case the package reaches a point where these can be made with a build command)
+*.Rcheck*
+# *.html
+# *.pdf
+
+# knitr and R markdown default cache directories
+*_cache/
+/cache/
+
+# Temporary files created by R markdown
+*.utf8.md
+*.knit.md
+ds_bpo.md
+
+# Windows thumbnail cache files
+Thumbs.db
+ehthumbs.db
+ehthumbs_vista.db
+
+# Folder config file
+Desktop.ini
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+# Thumbnails
+._*
+
+# Files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Destop files from Mac
+.DS_Store
+
+# Excel-specific files
+*.bas
+*.bat
+temp_file.xlsm
+*.xlsx
 

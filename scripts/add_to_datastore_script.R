@@ -1,7 +1,7 @@
-# Project goal - to add the Births by Parents' Country of Births report and underlying data to the London Datastore using 
+# Project goal - to add the Births by Mother's Country of Births report and underlying data to the London Datastore using 
 # the London Datastore API
 
-# N.B. A dataset called "Births by Parents' Country of Birth in London" has already been set up on the London Datastore
+# N.B. A dataset called "Births by Mother's Country of Birth in London" has already been set up on the London Datastore
 
 # N.B. This requires you to have previously installed  ldndatar from Github using a Github auth token and saved your 
 # London Datastore API Key to your .Renviron file as an object called lds_api_key
@@ -34,7 +34,7 @@ new_description<-
 names(new_description)<-"description"
 
 lds_patch_dataset(
-  slug="births-by-parents-country-of-birth-in-london",
+  slug="births-by-mothers-country-of-birth-in-london",
   my_api_key,
   patch=new_description
   )
@@ -54,12 +54,12 @@ names(datastore_resources_list)<-seq(1:length(datastore_resources_list))
 # the latter, whereas new resources which do not have names which are similar to existing resources are uploaded 
 # without replacing an existing resource.
 
-if (!"resource_id" %in% colnames(lds_meta_dataset(slug="births-by-parents-country-of-birth-in-london", my_api_key))) {
+if (!"resource_id" %in% colnames(lds_meta_dataset(slug="births-by-mothers-country-of-birth-in-london", my_api_key))) {
   
   map(datastore_resources_list,
       ~lds_add_resource(
         file_path=.x,
-        slug="births-by-parents-country-of-birth-in-london",
+        slug="births-by-mothers-country-of-birth-in-london",
         my_api_key
       ))
   
@@ -73,7 +73,7 @@ if (!"resource_id" %in% colnames(lds_meta_dataset(slug="births-by-parents-countr
     mutate(name2=str_remove(name2, "_[:digit:]{4}.jpeg|_[:digit:]{4}.csv"))
   
   current_resources_names<-
-    select(as_tibble(lds_meta_dataset(slug="births-by-parents-country-of-birth-in-london", my_api_key)),
+    select(as_tibble(lds_meta_dataset(slug="births-by-mothers-country-of-birth-in-london", my_api_key)),
            resource_title,
            resource_id) %>% 
     mutate(resource_title2=str_remove(resource_title, "_[:digit:]{4}.pdf|_[:digit:]{4}.xlsx|_[:digit:]{4}.tiff|_[:digit:]{4}.csv|_[:digit:]{4}.jpeg"))
@@ -81,7 +81,7 @@ if (!"resource_id" %in% colnames(lds_meta_dataset(slug="births-by-parents-countr
   datastore_resources_list<-
     full_join(datastore_resources_list,
               current_resources_names, by=c("name2"="resource_title2")) %>% 
-    mutate(name_for_resource=str_remove(name, "figures//maps/|figures//|maps/|data//"))
+    mutate(name_for_resource=basename(name))
   
   for (i in 1:nrow(datastore_resources_list)) {
     
@@ -89,7 +89,7 @@ if (!"resource_id" %in% colnames(lds_meta_dataset(slug="births-by-parents-countr
       
       lds_add_resource(
         file_path=datastore_resources_list$name[i],
-        slug="births-by-parents-country-of-birth-in-london",
+        slug="births-by-mothers-country-of-birth-in-london",
         my_api_key
       )
     }
@@ -98,7 +98,7 @@ if (!"resource_id" %in% colnames(lds_meta_dataset(slug="births-by-parents-countr
       
       lds_replace_resource(
         file_path=datastore_resources_list$name[i],
-        slug="births-by-parents-country-of-birth-in-london",
+        slug="births-by-mothers-country-of-birth-in-london",
         res_id=datastore_resources_list$resource_id[i],
         res_title=datastore_resources_list$name_for_resource[i],
         api_key=my_api_key

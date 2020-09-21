@@ -7,7 +7,7 @@ In order to make it easier to look at what these data tell us about births in Lo
 The original raw data can be seen on the ONS website here: https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths/bulletins/parentscountryofbirthenglandandwales/previousReleases
 
 And the London Datastore page which presents these data is here:
-https://data.london.gov.uk/dataset/births-by-parents-country-of-birth-in-london
+https://data.london.gov.uk/dataset/births-by-mothers-country-of-birth-in-london
 
 ## How to update the Births by Parents' Country of Birth in London page: a step-by-step guide
 In order to keep this dataset up-to-date, it needs to be updated whenever the ONS updates the main Births by Parents' Country of Birth in England and Wales dataset. This normally happens once a year at some point in either late Summer or Autumn. Updating the dataset is very simple, and can be accomplished by following these steps:
