@@ -32,6 +32,7 @@ years<-
   html_nodes(".margin-bottom--0") %>% 
   html_text() %>%
   str_extract("\\d{4}")
+years <- years[!is.na(years)]
 
 # 2.2 Get ONS workbook URLs
 workbook_urls<-
@@ -50,17 +51,17 @@ if (!dir.exists("data/ons_workbooks")) {dir.create("data/ons_workbooks")}
 # 2.5 Download ONS workbooks to ons_workbooks folder (deleting any .xls files which are already present)
 
 # Delete contents of ons_workbooks folder
-walk(list.files("data/ons_workbooks", full.names=TRUE), ~unlink(.x, recursive=TRUE))
+list.files("data/ons_workbooks", full.names=TRUE) %>% unlink(TRUE)
 
 # Download workbooks with download.file
-iwalk(workbook_urls,
-      ~ if (str_detect(.x, "\\b.xlsx\\b"))
-        
-      {download.file(.x, destfile=paste0("data/ons_workbooks/", .y, ".xlsx"), mode="wb")}
-      
-      else {download.file(.x, destfile=paste0("data/ons_workbooks/", .y, ".xls"), mode="wb")}
-      
-      )
+for(i in 1:length(workbook_urls)){
+  x <- workbook_urls[[i]]
+  if(str_detect(x, "\\b.xlsx\\b")){
+    download.file(x, destfile=paste0("data/ons_workbooks/", names(workbook_urls)[i], ".xlsx"), mode="wb")
+  } else {
+    download.file(x, destfile=paste0("data/ons_workbooks/", names(workbook_urls)[i], ".xls"), mode="wb")
+  }
+}
 
 # Remove workbook_urls
 rm(workbook_urls)
@@ -122,8 +123,13 @@ workbooks_2010_onwards<-map(workbooks_2010_onwards, ~read_excel(.x, sheet="Table
 names(workbooks_2010_onwards)<-rev(years[str_detect(years, "20[1-99]")]) 
 
 if (!dir.exists("data/ons_workbooks/xlsx_files")) {dir.create("data/ons_workbooks/xlsx_files")}
-walk(list.files("data/ons_workbooks/xlsx_files", pattern=".xlsx", full.names=TRUE), ~unlink(.x))
-iwalk(workbooks_2010_onwards, ~write.xlsx(.x, paste0("data/ons_workbooks/xlsx_files/year", .y, ".xlsx")))
+list.files("data/ons_workbooks/xlsx", full.names=TRUE) %>% unlink(TRUE)
+
+for(i in 1:length(workbooks_2010_onwards)){
+  write.xlsx(workbooks_2010_onwards[[i]],
+             paste0("data/ons_workbooks/xlsx_files/year", names(workbooks_2010_onwards)[i], ".xlsx"))
+}
+
 rm(workbooks_2010_onwards)
 
 # 2.4 Clean data for 2010 onwards
@@ -237,6 +243,7 @@ births_by_mothers_country_of_birth<-
 # 3.3 Add a year variable to each dataset
 births_by_mothers_country_of_birth<-
   map2(births_by_mothers_country_of_birth, names(births_by_mothers_country_of_birth), cbind)
+
 births_by_mothers_country_of_birth<-
   map(births_by_mothers_country_of_birth, ~select(.x,
                                                 year=contains(".y"),
