@@ -85,7 +85,7 @@ london_births_data_by_year %>%
          year=as.character(year)) %>% 
   ggplot(aes(x=year, y=Number, fill=fct_rev(Place)))+
   geom_bar(stat="identity")+
-  theme_gla()+
+  theme_gla(free_y_facets = TRUE)+
   coord_flip()+
   scale_fill_manual(values=pal)+
   scale_y_continuous(limits = c(0, 150000),
@@ -172,7 +172,7 @@ regions_births_data_latest_year %>%
   ggplot(aes(x=region, y=Number, fill=fct_rev(Place)))+
   geom_bar(stat="identity")+
   coord_flip()+
-  theme_gla()+
+  theme_gla(free_y_facets = TRUE)+
   theme(axis.text.y=element_text(vjust=0.4))+
   scale_fill_manual(values=pal)+
   scale_y_continuous(limits = c(0, 150000),
@@ -317,7 +317,7 @@ borough_births_data_latest_year<-
   left_join(borough_boundaries, by=c("gss_code"="GSS_CODE")) %>% 
   rename("Overseas Countries (total)"=`Total births - Non-UK-born mothers`)
 
-# if (!exists("figures/maps")) {dir.create("figures/maps")}
+if (!exists("figures/maps")) {dir.create("figures/maps")}
 # walk(list.files("figures/maps", full.names=TRUE), ~unlink(.x))
 # 
 # iwalk(borough_births_data_latest_year[5:13],
