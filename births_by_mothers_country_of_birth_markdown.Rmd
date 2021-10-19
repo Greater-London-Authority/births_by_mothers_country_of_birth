@@ -232,9 +232,9 @@ top_region_ew_total_births_overseas_mothers_perc<-
 
 In `r latest_year`, the region with the largest number of births to non-UK-born mothers was `r most_foreign_born_region_name` with `r most_foreign_born_region_number` live births (`r most_foreign_born_region_perc` of all live births in `r most_foreign_born_region_name`). By contrast, the region with the lowest number of births to non-UK-born mothers was the `r least_foreign_born_region_name` with `r least_foreign_born_region_number` live births to non-UK-born mothers, which only represented `r least_foreign_born_region_perc` of all live births in that region.
 
-Conversely, these data show that London accounted for `r top_region_ew_total_births_overseas_mothers_perc` of all the births to non-UK-born mothers in England and Wales in `r latest_year`, which was a far higher proprotion than any other region.
+Conversely, these data show that London accounted for `r top_region_ew_total_births_overseas_mothers_perc` of all the births to non-UK-born mothers in England and Wales in `r latest_year`, which was a far higher proportion than any other region.
 
-These data also highlight a couple of other interesting comparisons. Firstly, despite being the largest region in England and Wales in terms of population, London is not the region with the largest number of births to UK-born mothers. Secondly, London is the only region to have relatively large numbers of mothers from every region of the world according to the way in which the ONS has categorised them, including Africa, non-EU European countries (such as Turkey and Russia) and the "Rest of the World" (which includes the Americas and Oceania).   
+These data also highlight a couple of other interesting comparisons. Firstly, despite being the second largest region in England and Wales in terms of population, London is not the region with the largest number of births to UK-born mothers. Secondly, London is the only region to have relatively large numbers of mothers from every region of the world according to the way in which the ONS has categorised them, including Africa, non-EU European countries (such as Turkey and Russia) and the "Rest of the World" (which includes the Americas and Oceania).   
 
 The data comparing London with England and Wales as a whole (including London) is provided in the table below:
 
