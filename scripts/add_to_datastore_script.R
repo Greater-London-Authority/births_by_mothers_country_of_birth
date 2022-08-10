@@ -12,7 +12,6 @@
 # install.packages(c("tidyverse", "magrittr", "devtools", "rmarkdown"))
 library(tidyverse)
 library(magrittr)
-library(devtools)
 library(ldndatar)
 library(rmarkdown)
 
@@ -107,7 +106,4 @@ if (!"resource_id" %in% colnames(lds_meta_dataset(slug="births-by-mothers-countr
   }
 }
 
-# Section 3 - Clear Environment -------------------------------------------
-
-# 3.1
-rm(list = ls())    
+  
