@@ -117,9 +117,19 @@ data_2001_2009[2:9]<-map(data_2001_2009[2:9], ~fix_hackney(.x))
 
 names(data_2001_2009)<-seq(2009, 2001)
 
-# 2.3 Import data for 2010 onwards (N.B. this code assumes the relevant data is always on a worksheet called "Table 7")
+# 2.3 Import data for 2010 onwards (N.B. this code assumes the relevant data is always on a worksheet called "Table 7" or "7")
 workbooks_2010_onwards<-as.list(list.files("data/ons_workbooks", pattern="20[1-99]", full.names=TRUE))
-workbooks_2010_onwards<-map(workbooks_2010_onwards, ~read_excel(.x, sheet="Table 7"))
+
+get_sheet_name <- function(path, valid_names = c("Table 7", "7")) {
+  
+  sheetnames <- excel_sheets(path)
+  sheetname <- sheetnames[sheetnames %in% valid_names]
+  
+  return(sheetname)
+}
+
+sheetnames_2010_onwards<- lapply(workbooks_2010_onwards, get_sheet_name)
+workbooks_2010_onwards<-map2(workbooks_2010_onwards, sheetnames_2010_onwards, ~read_excel(.x, .y))
 names(workbooks_2010_onwards)<-rev(years[str_detect(years, "20[1-99]")]) 
 
 if (!dir.exists("data/ons_workbooks/xlsx_files")) {dir.create("data/ons_workbooks/xlsx_files")}
