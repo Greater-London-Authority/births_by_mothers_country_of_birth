@@ -73,6 +73,10 @@ headings<-c("usual_residence_of_mother", "total_births_all", "total_births_uk_mo
             "remove1", "remove2", "overseas_mothers_total_EU", "overseas_mothers_post2004_EU_accession_countries",
             "overseas_mothers_non_EU_europe", "overseas_mothers_asia", "overseas_mothers_africa", "overseas_mothers_rest_of_world")
 headings2<-headings[-6]
+# column order changed for 2022 - africa swapped places with middle east and asia 
+headings3<-c("usual_residence_of_mother", "total_births_all", "total_births_uk_mothers", "total_births_overseas_mothers",
+             "remove1", "overseas_mothers_total_EU", "overseas_mothers_post2004_EU_accession_countries",
+             "overseas_mothers_non_EU_europe", "overseas_mothers_africa", "overseas_mothers_asia", "overseas_mothers_rest_of_world")
 
 regions<-c("EAST", "EAST MIDLANDS", "ENGLAND", "LONDON", "NORTH EAST", "NORTH WEST", "SOUTH EAST",
            "SOUTH WEST", "WALES", "WEST MIDLANDS", "YORKSHIRE AND THE HUMBER")
@@ -117,9 +121,19 @@ data_2001_2009[2:9]<-map(data_2001_2009[2:9], ~fix_hackney(.x))
 
 names(data_2001_2009)<-seq(2009, 2001)
 
-# 2.3 Import data for 2010 onwards (N.B. this code assumes the relevant data is always on a worksheet called "Table 7")
+# 2.3 Import data for 2010 onwards (N.B. this code assumes the relevant data is always on a worksheet called "Table 7" or "7")
 workbooks_2010_onwards<-as.list(list.files("data/ons_workbooks", pattern="20[1-99]", full.names=TRUE))
-workbooks_2010_onwards<-map(workbooks_2010_onwards, ~read_excel(.x, sheet="Table 7"))
+
+get_sheet_name <- function(path, valid_names = c("Table 7", "7")) {
+  
+  sheetnames <- excel_sheets(path)
+  sheetname <- sheetnames[sheetnames %in% valid_names]
+  
+  return(sheetname)
+}
+
+sheetnames_2010_onwards<- lapply(workbooks_2010_onwards, get_sheet_name)
+workbooks_2010_onwards<-map2(workbooks_2010_onwards, sheetnames_2010_onwards, ~read_excel(.x, .y))
 names(workbooks_2010_onwards)<-rev(years[str_detect(years, "20[1-99]")]) 
 
 if (!dir.exists("data/ons_workbooks/xlsx_files")) {dir.create("data/ons_workbooks/xlsx_files")}
@@ -172,18 +186,29 @@ data_2010_onwards[c(1:5, 7, 8)]<-
       distinct(`2`, .keep_all=TRUE) %>% 
       set_colnames(headings2))
 
+# data for 2015 comes through with geography codes in column 2
 data_2010_onwards[[6]]<-
   data_2010_onwards[[6]] %>%
   distinct(`3`, .keep_all=TRUE) %>% 
   select(-`2`) %>% 
   set_colnames(headings2)
 
-data_2010_onwards[9:length(data_2010_onwards)]<-
-  map(data_2010_onwards[9:length(data_2010_onwards)],
+# 2018 onwards includes the 'geography' variable
+data_2010_onwards[9:12]<-
+  map(data_2010_onwards[9:12],
     ~.x %>% 
       distinct(`2`, .keep_all=TRUE) %>% 
       select(-`3`) %>% 
       set_colnames(headings2))
+
+# africa and middle east/asia swapped order in 2022 
+#TODO currently assume this will continue in subsequent years
+data_2010_onwards[13:length(data_2010_onwards)]<-
+  map(data_2010_onwards[13:length(data_2010_onwards)],
+      ~.x %>% 
+        distinct(`2`, .keep_all=TRUE) %>% 
+        select(-`3`) %>% 
+        set_colnames(headings3))
 
 data_2010_onwards<-
   data_2010_onwards<-

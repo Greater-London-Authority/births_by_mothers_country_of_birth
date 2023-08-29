@@ -1,7 +1,5 @@
 ---
 title: "Births by Mother's Country of Birth in London"
-author: "GLA demography"
-date: "18/10/2021"
 output:
   html_document: default
   pdf_document: default
@@ -67,7 +65,7 @@ https://github.com/Greater-London-Authority/births_by_mothers_country_of_birth
 
 $~$
 
-```{r fig_total_births_per_year, fig.height = 6, fig.width = 10, echo=FALSE}
+```{r fig_total_births_per_year, fig.height = 6, fig.width = 10, echo=FALSE, include = FALSE}
 london_births_data_by_year<-
   mothers_cob_data %>% 
   filter(`Mother's place of residence`=="LONDON") %>% 
@@ -78,7 +76,7 @@ london_births_data_by_year<-
 
 pal <- gla_pal(gla_theme = "default", palette_type = "categorical", n = 7)
 
-london_births_data_by_year %>% 
+p1 <- london_births_data_by_year %>% 
   select(-"Mother's place of residence") %>% 
   gather(Place, Number, -year) %>% 
   mutate(Place=as_factor(Place),
@@ -94,7 +92,12 @@ london_births_data_by_year %>%
   theme(panel.grid.major.y = element_blank())+
   labs(title = "Number of live births in London by mother's place of birth, 2001-onwards",
        caption = "\nChart: GLA City Intelligence\nSource: ONS Births by parents' country of births statistics")  
-ggsave("figures/chart_1.jpeg", width=10, height=6, units="in", type="cairo") 
+
+ggsave("figures/chart_1.jpeg", p1, width=10, height=6, units="in", type="cairo", device = "jpeg") 
+```
+
+```{r p1, fig.height = 6, fig.width = 10, echo=FALSE}
+p1
 ```
 
 $~$
@@ -149,7 +152,7 @@ In `r latest_year`, the region of origin which supplied the largest number of bi
 
 $~$
 
-```{r fig_total_births_per_year_by_region, fig.height = 6, fig.width = 10, echo=FALSE}
+```{r fig_total_births_per_year_by_region, fig.height = 6, fig.width = 10, echo=FALSE, include=FALSE}
 regions_births_data_latest_year<-
   mothers_cob_data %>% 
   filter(type=="Region" | `Mother's place of residence`=="WALES") %>% 
@@ -165,7 +168,7 @@ regions_births_data_latest_year<-
   mutate(region=str_to_title(region),
          region=as_factor(region))
 
-regions_births_data_latest_year %>% 
+p2 <- regions_births_data_latest_year %>% 
   select(region:`Rest of the world`) %>% 
   gather(Place, Number, -region) %>% 
   mutate(Place=as_factor(Place)) %>% 
@@ -180,7 +183,12 @@ regions_births_data_latest_year %>%
   theme(panel.grid.major.y = element_blank())+
   labs(title = paste("Number of live births in each region by mother's place of\nbirth,", latest_year),
        caption = "\nChart: GLA City Intelligence\nSource: ONS Births by parents' country of births statistics")
-ggsave("figures/chart_2.jpeg", width=10, height=6, units="in", type="cairo")
+
+ggsave("figures/chart_2.jpeg", p2, width=10, height=6, units="in", type="cairo", device = "jpeg")
+```
+
+```{r p2, fig.height = 6, fig.width = 10, echo=FALSE}
+p2
 ```
 
 $~$
@@ -232,11 +240,11 @@ top_region_ew_total_births_overseas_mothers_perc<-
 
 In `r latest_year`, the region with the largest number of births to non-UK-born mothers was `r most_foreign_born_region_name` with `r most_foreign_born_region_number` live births (`r most_foreign_born_region_perc` of all live births in `r most_foreign_born_region_name`). By contrast, the region with the lowest number of births to non-UK-born mothers was the `r least_foreign_born_region_name` with `r least_foreign_born_region_number` live births to non-UK-born mothers, which only represented `r least_foreign_born_region_perc` of all live births in that region.
 
-Conversely, these data show that London accounted for `r top_region_ew_total_births_overseas_mothers_perc` of all the births to non-UK-born mothers in England and Wales in `r latest_year`, which was a far higher proportion than any other region.
+The data shows that London accounted for `r top_region_ew_total_births_overseas_mothers_perc` of all the births to non-UK-born mothers in England and Wales in `r latest_year`, which was a far higher proportion than any other region.
 
-These data also highlight a couple of other interesting comparisons. Firstly, despite being the second largest region in England and Wales in terms of population, London is not the region with the largest number of births to UK-born mothers. Secondly, London is the only region to have relatively large numbers of mothers from every region of the world according to the way in which the ONS has categorised them, including Africa, non-EU European countries (such as Turkey and Russia) and the "Rest of the World" (which includes the Americas and Oceania).   
+These data also highlight a couple of other interesting comparisons. Firstly, despite being the second largest region in England and Wales in terms of population, London is not the region with the largest number of births to UK-born mothers. Secondly, London is the only region to have relatively large numbers of mothers from every region of the world according to the way in which the ONS has categorised them, including Africa, non-EU European countries (such as Turkey and Russia) and the "Rest of the World" (which includes the Americas and Oceania).
 
-The data comparing London with England and Wales as a whole (including London) is provided in the table below:
+The data comparing London with England & Wales excluding London and England & Wales as a whole (including London) is provided in the table below:
 
 $~$
 
@@ -245,7 +253,7 @@ ew_totals<-
   regions_births_data_latest_year %>% 
   select(-overseas_perc) %>% 
   summarize_if(is.numeric, sum) %>% 
-  mutate(region="England and Wales")
+  mutate(region="England & Wales")
 
 london_total_table<-
   regions_births_data_latest_year %>% 
@@ -258,7 +266,18 @@ london_total_table<-
          `Total Births`=total_births,
          `Total Births - UK Mothers`=UK,
          `Total Births - Overseas Mothers`=total_births_overseas_mothers,
-         `Pre-2004 EU countries`:`Rest of the world`) %>% 
+         `Pre-2004 EU countries`:`Rest of the world`)
+
+rest_of_ew <- london_total_table %>% 
+  pivot_longer(cols = 3:11) %>% 
+  pivot_wider(names_from = Region, values_from = value) %>% 
+  mutate(`Rest of England & Wales` = `England & Wales` - London) %>% 
+  pivot_longer(cols = 3:5, names_to = "Region", values_to = "value") %>% 
+  pivot_wider(names_from = name, values_from = value) %>% 
+  mutate(Region = factor(Region, levels = c("London", "Rest of England & Wales", "England & Wales"))) %>% 
+  arrange(Region)
+
+final_table <- rest_of_ew %>% 
   mutate_if(is.numeric, funs(perc=round(./`Total Births`, 2))) %>% 
   mutate_at(vars(contains("perc")), ~percent(.)) %>% 
   mutate_at(vars(3:11), ~comma(.)) %>% 
@@ -273,7 +292,7 @@ london_total_table<-
          contains("Africa"),
          contains("Rest of the world"))
 
-london_total_table %>% 
+final_table %>% 
   kable(col.names = c("Year",
                       "Region",
                       "No.",
@@ -318,6 +337,9 @@ borough_births_data_latest_year<-
   rename("Overseas Countries (total)"=`Total births - Non-UK-born mothers`)
 
 if (!exists("figures/maps")) {dir.create("figures/maps")}
+# remove all files currently in the maps folder
+file.remove(list.files("figures/maps", full.names=TRUE))
+
 # walk(list.files("figures/maps", full.names=TRUE), ~unlink(.x))
 # 
 # iwalk(borough_births_data_latest_year[5:13],
@@ -347,7 +369,7 @@ for(i in 5:13){
     theme(legend.position="right")+
     labs(title=paste0("Proportion of all live births that were to mothers born in\n", names(borough_births_data_latest_year)[i], ", ", latest_year),
          caption = "\nChart: GLA City Intelligence\nSource: ONS Births by parents' country of births statistics\nN.B. Data for City of London are included with Hackney")
-  ggsave(paste0("figures/maps/", names(borough_births_data_latest_year)[i], "_", latest_year, ".jpeg"), plot = a, width=8, height=8, units="in")
+  ggsave(paste0("figures/maps/", names(borough_births_data_latest_year)[i], ".jpeg"), plot = a, width=8, height=8, units="in")
 }
 
 maps_list<-map(as.list(list.files("figures/maps", full.names=TRUE)), ~image_read(.x))
