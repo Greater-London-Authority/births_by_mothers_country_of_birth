@@ -371,7 +371,7 @@ for(i in 5:13){
   ggsave(paste0("figures/maps/", names(borough_births_data_latest_year)[i], "_", latest_year, ".jpeg"), plot = a, width=8, height=8, units="in")
 }
 
-maps_list<-map(as.list(list.files("figures/maps", full.names=TRUE)), ~image_read(.x))
+maps_list<-map(as.list(list.files("figures/maps", full.names=TRUE, pattern = paste0("_", latest_year, ".jpeg"))), ~image_read(.x))
 
 image_write(image_append(c(maps_list[[9]], maps_list[[4]])), "map_slot_1.jpeg")
 image_write(image_append(c(maps_list[[6]], maps_list[[5]])), "map_slot_2.jpeg")
