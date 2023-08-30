@@ -2,6 +2,7 @@
 title: "Births by Mother's Country of Birth in London"
 output:
   html_document: default
+always_allow_html: true
 ---
 
 
