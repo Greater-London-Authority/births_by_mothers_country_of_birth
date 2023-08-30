@@ -2,8 +2,6 @@
 title: "Births by Mother's Country of Birth in London"
 output:
   html_document: default
-  pdf_document: default
-always_allow_html: yes
 ---
 
 
@@ -19,8 +17,8 @@ library(readxl)
 library(knitr)
 library(sf)
 library(sp)
-library(kableExtra)
 library(magick)
+library(kableExtra)
 
 # Import borough boundaries
 borough_boundaries<-
@@ -361,7 +359,7 @@ for(i in 5:13){
   x <- rename(x, value = last(names(x)))
   a <- x %>% 
     ggplot(aes(geometry = geometry, fill = value))+
-    ggla_sf()+
+    ggla_sf(color = "white", size = 0.5)+
     theme_gla()+
     scale_fill_gradient(labels=percent_format(),
                         low="slategray1",
