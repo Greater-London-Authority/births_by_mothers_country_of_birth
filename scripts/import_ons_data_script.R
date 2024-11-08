@@ -53,14 +53,19 @@ if (!dir.exists("data/ons_workbooks")) {dir.create("data/ons_workbooks")}
 # Delete contents of ons_workbooks folder
 list.files("data/ons_workbooks", full.names=TRUE) %>% unlink(TRUE)
 
-# Download workbooks with download.file
+# Download workbooks with download.file - added pause after each download to try and reduce number of failed downloads
 for(i in 1:length(workbook_urls)){
   x <- workbook_urls[[i]]
   if(str_detect(x, "\\b.xlsx\\b")){
-    download.file(x, destfile=paste0("data/ons_workbooks/", names(workbook_urls)[i], ".xlsx"), mode="wb")
+    if(!file.exists(paste0("data/ons_workbooks/", names(workbook_urls)[i], ".xlsx"))){
+      download.file(x, destfile=paste0("data/ons_workbooks/", names(workbook_urls)[i], ".xlsx"), mode="wb")
+    }
   } else {
-    download.file(x, destfile=paste0("data/ons_workbooks/", names(workbook_urls)[i], ".xls"), mode="wb")
+    if(!file.exists(paste0("data/ons_workbooks/", names(workbook_urls)[i], ".xls"))){
+      download.file(x, destfile=paste0("data/ons_workbooks/", names(workbook_urls)[i], ".xls"), mode="wb")
+    }
   }
+  Sys.sleep(1)
 }
 
 # Remove workbook_urls
@@ -78,7 +83,7 @@ headings3<-c("usual_residence_of_mother", "total_births_all", "total_births_uk_m
              "remove1", "overseas_mothers_total_EU", "overseas_mothers_post2004_EU_accession_countries",
              "overseas_mothers_non_EU_europe", "overseas_mothers_africa", "overseas_mothers_asia", "overseas_mothers_rest_of_world")
 
-regions<-c("EAST", "EAST MIDLANDS", "ENGLAND", "LONDON", "NORTH EAST", "NORTH WEST", "SOUTH EAST",
+regions<-c("EAST", "EAST OF ENGLAND", "EAST MIDLANDS", "ENGLAND", "LONDON", "NORTH EAST", "NORTH WEST", "SOUTH EAST",
            "SOUTH WEST", "WALES", "WEST MIDLANDS", "YORKSHIRE AND THE HUMBER")
 boroughs<-dplyr::pull(read_csv("borough_names.csv"))
 regions_and_boroughs<-c(regions, boroughs)
@@ -95,6 +100,8 @@ data_2001_2009<-
       filter(!is.na(total_births_all)) %>% 
       select(-contains("remove")) %>% 
       filter(usual_residence_of_mother %in% regions_and_boroughs) %>% 
+      mutate(usual_residence_of_mother = recode(usual_residence_of_mother,
+                                                "EAST" = "EAST OF ENGLAND")) %>%
       distinct(usual_residence_of_mother, .keep_all=TRUE) %>% 
       mutate_at(vars(total_births_all:overseas_mothers_rest_of_world), ~as.numeric(.)))
 
@@ -117,6 +124,8 @@ fix_hackney<-function(x) {
   
   return(data)
 }
+
+
 data_2001_2009[2:9]<-map(data_2001_2009[2:9], ~fix_hackney(.x))
 
 names(data_2001_2009)<-seq(2009, 2001)
@@ -124,7 +133,7 @@ names(data_2001_2009)<-seq(2009, 2001)
 # 2.3 Import data for 2010 onwards (N.B. this code assumes the relevant data is always on a worksheet called "Table 7" or "7")
 workbooks_2010_onwards<-as.list(list.files("data/ons_workbooks", pattern="20[1-99]", full.names=TRUE))
 
-get_sheet_name <- function(path, valid_names = c("Table 7", "7")) {
+get_sheet_name <- function(path, valid_names = c("Table 7", "7", "Table_6a")) {
   
   sheetnames <- excel_sheets(path)
   sheetname <- sheetnames[sheetnames %in% valid_names]
@@ -184,7 +193,10 @@ data_2010_onwards[c(1:5, 7, 8)]<-
   map(data_2010_onwards[c(1:5, 7, 8)],
     ~.x %>% 
       distinct(`2`, .keep_all=TRUE) %>% 
-      set_colnames(headings2))
+      set_colnames(headings2) %>%
+      mutate(usual_residence_of_mother = recode(usual_residence_of_mother,
+                                                "EAST" = "EAST OF ENGLAND"))
+    )
 
 # data for 2015 comes through with geography codes in column 2
 data_2010_onwards[[6]]<-
